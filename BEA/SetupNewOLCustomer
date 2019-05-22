@@ -1,0 +1,131 @@
+if (!String.prototype.trim) { //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim#Polyfill
+  String.prototype.trim = function () {
+    return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+  };
+}
+
+String.prototype.toTitleCase = function() {
+	var i, j, str, lowers, uppers;
+	str = this.replace(/([^\W_]+[^\s-]*) */g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+
+	// Certain minor words should be left lowercase unless 
+	// they are the first or last words in the string
+	lowers = ['A', 'An', 'The', 'And', 'But', 'Or', 'For', 'Nor', 'As', 'At', 'By', 'For', 'From', 'In', 'Into', 'Near', 'Of', 'On', 'Onto', 'To', 'With'];
+	for (i = 0, j = lowers.length; i < j; i++)
+	str = str.replace(new RegExp('\\s' + lowers[i] + '\\s', 'g'), function(txt) {return txt.toLowerCase();});
+
+	// Certain words such as initialisms or acronyms should be left uppercase
+	uppers = ['Usa', 'Id', 'Tv', 'Llc', 'Llp', 'Pllc', 'Md', 'Dds', 'Dmd', 'Pc', 'Dba', 'Ii', 'Iii', 'Rv', 'Ne', 'Nw', 'Se', 'Sw'];
+	for (i = 0, j = uppers.length; i < j; i++)
+	str = str.replace(new RegExp('\\b' + uppers[i] + '\\b', 'g'), uppers[i].toUpperCase());
+	return str;
+}
+
+String.prototype.replacer = function() {
+	return this.replace(/[^\sa-z0-9]/gi,'').replace(/ +/g,' ');
+}
+
+function main(clipboardStr) {
+
+	//var replacer = /[^\sa-z0-9_-]/gi;
+	var newCustomer = getCurrentClipboard().replace(/ +/g,' ').split(/\r/);
+	var newCustomerLength = newCustomer.length;
+	var trimmedArray = [];
+	for (i = 0; i < newCustomerLength; i++){
+		var trimmedData = newCustomer[i].trim();
+		if(trimmedData) {trimmedArray[trimmedArray.length] = trimmedData;}
+	}
+	var cName = trimmedArray[0].toTitleCase().replacer().substr(0,48);
+	var tres = trimmedArray[2];
+	var cuatro = trimmedArray[3];
+	var num = /^[0-9]*$/;
+	var phone = trimmedArray[12].replace(/[\s\(]/g,"").replace(/[\.\)]/g,"-")
+
+// let's get busy, to the fields!
+	manuallyExecuteMacro("[TAB]");
+
+// cleans customer name, adds WL tag
+	setClipboard(cName + " (AT&T-White Label)");
+	manuallyExecuteMacro("[PASTEDEFAULT][TAB]");
+	
+// cleans customer name for clarify desc
+	setClipboard(cName);
+	manuallyExecuteMacro("[PASTEDEFAULT][TAB]");
+	
+// check if item cuatro[4] is 4-digits
+	if (cuatro.length == 4 && cuatro.match(num)){
+		setClipboard(cuatro);
+		manuallyExecuteMacro("[PASTEDEFAULT][TAB][PASTEDEFAULT][TAB]");
+	}else{
+		setClipboard("bad 4-digit ["+cuatro+"]");
+		manuallyExecuteMacro("[PASTEDEFAULT]");
+		return false;
+	}
+
+// check if item tres[3] is 3- or 5-digits
+	if (tres.length == 3 || tres.length == 5 && tres.match(num)){
+		setClipboard(tres);
+		manuallyExecuteMacro("[PASTEDEFAULT][TAB][MIMIC]09[TAB][MIMIC]13[TAB][MIMIC]0101[TAB REPEAT=3][MIMIC]1[TAB]");
+	}else{
+		setClipboard("bad 3/5-digit ["+tres+"]");
+		manuallyExecuteMacro("[PASTEDEFAULT]");
+		return false;
+	}
+
+// clean street
+	setClipboard(trimmedArray[5].replacer().toTitleCase());
+	manuallyExecuteMacro("[PASTEDEFAULT][TAB REPEAT=2]");
+
+// clean city
+	setClipboard(trimmedArray[6].replacer().toTitleCase());
+	manuallyExecuteMacro("[PASTEDEFAULT][TAB]");
+
+// clean state
+	var state = trimmedArray[7].replacer().toUpperCase();
+	setClipboard(state);
+	if (state.length == 2){
+		if (state == "PR"){
+			manuallyExecuteMacro("[PASTEDEFAULT][TAB][MIMIC]pu[TAB]");
+		}else{
+			manuallyExecuteMacro("[PASTEDEFAULT][TAB REPEAT=2]");
+		}
+	}else{
+		setClipboard("bad state ["+state+"]");
+		manuallyExecuteMacro("[PASTEDEFAULT]");
+		return false;
+	}
+
+// clean zip
+	setClipboard(trimmedArray[8].replacer());
+	manuallyExecuteMacro("[PASTEDEFAULT][TAB]");
+
+// clean fName
+	setClipboard(trimmedArray[10].replacer().toTitleCase());
+	manuallyExecuteMacro("[PASTEDEFAULT][TAB]");
+
+// clean lName
+	setClipboard(trimmedArray[11].replacer().toTitleCase());
+	manuallyExecuteMacro("[PASTEDEFAULT][TAB]");
+	
+// clean phone
+	if (phone.length == 12 && phone.match(/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/)){
+		setClipboard(phone);
+		manuallyExecuteMacro("[PASTEDEFAULT][TAB]");
+	}else{
+		setClipboard("bad phone number ["+phone+"]");
+		manuallyExecuteMacro("[PASTEDEFAULT]");
+		return false;
+	}
+
+// clean email
+	if (trimmedArray[13]){setClipboard(trimmedArray[13].toLowerCase());
+	}else{setClipboard("not@provided.com");}
+	manuallyExecuteMacro("[PASTEDEFAULT][TAB]SMARTS[TAB]SMARTS[TAB][DOWN REPEAT=3][TAB]");
+	
+// Aspect_queue same as 4-digit
+	setClipboard(cuatro);
+	manuallyExecuteMacro("[PASTEDEFAULT][TAB]1[TAB][END][TAB][END][TAB][MIMIC]b[UP][TAB][DOWN][TAB]");
+
+// save for Clarify Loader sheet
+	setClipboard(cName + "\t" + tres);
+}
