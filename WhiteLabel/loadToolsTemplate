@@ -1,0 +1,14 @@
+[SELECTALL]GO##	[POPUPITEM=3]	[POPUPITEM=2]
+[POPUPITEM=0]	[POPUPITEM=1]_[POPUPITEM=2]	[POPUPITEM=1]
+
+echo "NAMEORIP=[POPUPITEM=0] SNMPVERSION=V2C SEEDNAME=[POPUPITEM=1]_[POPUPITEM=2] ACCESSMODE=ICMPSNMP" > /smartsxfr/chcook/chcook_import.txt; vim /smartsxfr/scripts/Multi06/tail_hosts
+
+ping -c 3 -i 2 -f -W 2 -I 2.1.20.132 [POPUPITEM=0]
+ping -c 3 -i 2 -f -W 2 -I 2.1.20.133 [POPUPITEM=0]
+sm_snmp --dest=[POPUPITEM=0] --snmp=2c --community=WhiteLabel_5173 --useif=2.1.20.132 walk .1.3.6.1.2.1.1.1
+sm_snmp --dest=[POPUPITEM=0] --snmp=2c --community=WhiteLabel_5173 --useif=2.1.20.133 walk .1.3.6.1.2.1.1.1
+
+/smartsxfr/chcook/chcook_import.txt
+
+Unable to load clarify sites
+[POPUPITEM=1]_[POPUPITEM=2][KEY="001024SHIFT+HOME"][CUT]  
