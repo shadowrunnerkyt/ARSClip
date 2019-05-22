@@ -1,0 +1,5 @@
+first@email.com; second@email.com; third@email.com[TAB][KEY="011043CTRL+SHIFT+C"]
+manager1@email.com; manager2@email.com; teammailbox@email.com; [TAB REPEAT=2]
+White Label - [[POPUPITEM=0]] - [POPUPITEM=1][TAB]
+Ticket number [[POPUPITEM=1]] for White Label is complete and the devices are provisioned. 
+Please perform the QA process and let us know if there are any issues.
