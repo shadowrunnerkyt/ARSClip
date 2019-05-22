@@ -1,0 +1,12 @@
+function main(clipboardStr) {
+
+	var date = new Date();
+	var year = date.getFullYear().toString().slice(-2);
+	var month = ('0' + (date.getMonth() + 1)).slice(-2);
+	var day = ('0' + (date.getDate())).slice(-2);
+	setClipboard('old_' + year + month + day + '_');
+	
+	start_ac_macro:
+		[HOME][PASTEDEFAULT][TAB REPEAT=2][MIMIC]i[TAB REPEAT=10][ENTER][TAB][ENTER]
+	end_ac_macro:
+}
